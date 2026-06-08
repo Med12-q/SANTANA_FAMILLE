@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { isAdminAuthenticated } from '@/lib/admin-auth'
 import { redirect } from 'next/navigation'
 import { getAllCandidates, getStats, initDb } from '@/lib/db'

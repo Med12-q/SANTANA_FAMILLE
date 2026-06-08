@@ -1,9 +1,14 @@
 # SANTANA FAMILLE — Plateforme officielle de recrutement
 
+<div align="center">
+
+![SANTANA FAMILLE](https://files.catbox.moe/sn4lrd.jpg)
+
 > *"L'élite ne se rejoint pas. Elle se mérite."*
 
-Plateforme web officielle de la **SANTANA FAMILLE — Les Démons de la Terreur**.  
-Interface de recrutement premium avec IA intégrée, gestion des candidatures et administration complète.
+**Les Démons de la Terreur** — Plateforme de recrutement premium avec IA intégrée.
+
+</div>
 
 ---
 
@@ -11,97 +16,44 @@ Interface de recrutement premium avec IA intégrée, gestion des candidatures et
 
 | Couche | Technologie |
 |--------|-------------|
-| Framework | Next.js 15 (App Router, Edge Runtime) |
-| Language | TypeScript 5 (strict mode) |
+| Framework | Next.js 16 (App Router, Edge Runtime) |
+| Language | TypeScript 5.7 (strict mode) |
 | Styling | Tailwind CSS v4 + shadcn/ui (base-nova) |
 | Animations | Framer Motion |
 | Base de données | PostgreSQL via Neon Serverless |
 | Email | Resend |
-| IA | OpenAI GPT-4o-mini via AI SDK |
-| Auth admin | JWT (jose) + cookie httpOnly |
-| Déploiement | Vercel / Cloudflare Workers |
+| IA | OpenAI GPT-4o-mini via AI SDK v6 |
+| Auth admin | JWT (jose v6) + cookie httpOnly |
+| Déploiement | Vercel |
 
 ## Fonctionnalités
 
-- **Hero vidéo** — Fond vidéo immersif plein écran avec superpositions gradient
-- **Formulaire multi-étapes** — Email → Profil → Candidature, anti-spam (honeypot + rate limiting)
-- **Lien groupe WhatsApp confidentiel** — Révélé uniquement après soumission de candidature
-- **Santana AI** — Chatbot IA officiel avec connaissance complète de la famille
-- **Emails automatiques** — Confirmation candidat (Resend) + notification admin
-- **Interface d'administration** — Tableau de bord complet avec statuts, notes, export CSV
-- **Design premium** — Dark theme minimaliste, typographie précise, micro-animations
-- **SEO & Performance** — Métadonnées complètes, Edge Runtime, images optimisées
+- **Hero vidéo** — Fond vidéo immersif plein écran
+- **Typewriter animation** — Texte bleu animé en machine à écrire
+- **Formulaire multi-étapes** — Email → Profil → Candidature, anti-spam
+- **Lien groupe WhatsApp confidentiel** — Révélé uniquement après soumission
+- **Santana AI** — Chatbot IA officiel 24h/24
+- **Emails automatiques** — Confirmation candidat + notification admin
+- **Dashboard admin** — Statuts, notes, export CSV
+- **SEO complet** — Métadonnées, Open Graph, performance optimisée
 
-## Structure du projet
+## Variables d'environnement requises
 
-```
-├── app/
-│   ├── (site)/               # Layout public (navbar + footer)
-│   │   ├── page.tsx          # Accueil
-│   │   ├── recrutement/      # Formulaire de candidature
-│   │   ├── a-propos/         # Histoire et vision
-│   │   ├── hierarchie/       # Grades et structure
-│   │   ├── reglement/        # Règlement officiel
-│   │   ├── santana-ai/       # Chat IA plein écran
-│   │   └── contact/          # Contacts officiels
-│   ├── administration/       # Interface admin (protégée JWT)
-│   └── api/chat/             # API Edge pour l'IA
-├── components/
-│   ├── home/                 # Hero, sections, leader
-│   ├── admin/                # Dashboard, login
-│   └── ui/                   # Composants shadcn
-└── lib/                      # DB, email, auth, export, knowledge
-```
+Ajoutez ces variables dans **Vercel → Settings → Environment Variables** :
 
-## Installation locale
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | URL Neon PostgreSQL (ex: `postgres://...`) |
+| `OPENAI_API_KEY` | Clé API OpenAI pour Santana AI |
+| `RESEND_API_KEY` | Clé Resend pour les emails |
+| `ADMIN_PASSWORD` | Mot de passe panneau admin |
+| `JWT_SECRET` | Secret JWT (min. 32 chars) |
 
-```bash
-npm install
-cp .env.example .env.local
-# Remplissez les variables dans .env.local
-npm run dev
-```
+## Déploiement Vercel (recommandé)
 
-## Variables d'environnement
-
-| Variable | Description | Requis |
-|----------|-------------|--------|
-| `DATABASE_URL` | Connexion Neon PostgreSQL | ✅ |
-| `OPENAI_API_KEY` | Clé API OpenAI (GPT-4o-mini) | ✅ |
-| `RESEND_API_KEY` | Clé API Resend pour les emails | ✅ |
-| `ADMIN_PASSWORD` | Mot de passe du panneau admin | ✅ |
-| `JWT_SECRET` | Secret JWT (min. 32 caractères) | ✅ |
-
-## Déploiement
-
-### Vercel (recommandé)
-
-Importez le repo dans Vercel et configurez les variables d'environnement dans le tableau de bord.
-
-### Cloudflare Workers
-
-```bash
-npm run build && wrangler deploy
-```
-
-## Administration
-
-Accès : `/administration`
-
-Fonctionnalités :
-- Vue de toutes les candidatures avec filtrage par statut
-- Mise à jour du statut (En attente / En test / Approuvé / Rejeté)
-- Ajout de notes internes par candidat
-- Suppression de candidatures
-- Export CSV complet
-
-## Sécurité
-
-- Honeypot anti-bot sur le formulaire de recrutement
-- Rate limiting : 3 soumissions par IP par heure
-- JWT httpOnly pour l'authentification admin
-- Validation stricte côté serveur (Server Actions)
-- Lien WhatsApp groupe principal jamais exposé publiquement
+1. Importez ce repo dans [vercel.com/new](https://vercel.com/new)
+2. Ajoutez les 5 variables d'environnement ci-dessus
+3. Cliquez **Deploy** — le build réussit automatiquement
 
 ---
 

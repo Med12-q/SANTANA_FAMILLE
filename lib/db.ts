@@ -1,8 +1,16 @@
 import { neon } from '@neondatabase/serverless'
 
-const sql = neon(process.env.DATABASE_URL!)
+let _sql: ReturnType<typeof neon> | null = null
+function getSql() {
+  if (!_sql) {
+    if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set')
+    _sql = neon(process.env.DATABASE_URL)
+  }
+  return _sql
+}
 
 export async function initDb() {
+  const sql = getSql()
   await sql`
     CREATE TABLE IF NOT EXISTS candidates (
       id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
@@ -27,36 +35,26 @@ export async function initDb() {
 }
 
 export type Candidate = {
-  id: string
-  full_name: string
-  pseudo: string
-  age?: string
-  country?: string
-  technical_level?: string
-  previous_clans?: string
-  experience?: string
-  years_active?: string
-  motivation?: string
-  availability?: string
-  email?: string
-  whatsapp?: string
-  skills?: string
-  status: string
-  notes?: string
-  created_at: string
+  id: string; full_name: string; pseudo: string; age?: string; country?: string
+  technical_level?: string; previous_clans?: string; experience?: string; years_active?: string
+  motivation?: string; availability?: string; email?: string; whatsapp?: string
+  skills?: string; status: string; notes?: string; created_at: string
 }
 
 export async function getAllCandidates(): Promise<Candidate[]> {
+  const sql = getSql()
   const rows = await sql`SELECT * FROM candidates ORDER BY created_at DESC`
   return rows as Candidate[]
 }
 
 export async function getCandidateById(id: string): Promise<Candidate | null> {
+  const sql = getSql()
   const rows = await sql`SELECT * FROM candidates WHERE id = ${id}`
   return (rows[0] as Candidate) ?? null
 }
 
 export async function createCandidate(data: Omit<Candidate, 'id' | 'created_at'>): Promise<Candidate> {
+  const sql = getSql()
   const rows = await sql`
     INSERT INTO candidates (full_name,pseudo,age,country,technical_level,previous_clans,experience,years_active,motivation,availability,email,whatsapp,skills,status)
     VALUES (${data.full_name},${data.pseudo},${data.age||null},${data.country||null},${data.technical_level||null},${data.previous_clans||null},${data.experience||null},${data.years_active||null},${data.motivation||null},${data.availability||null},${data.email||null},${data.whatsapp||null},${data.skills||null},'pending')
@@ -66,14 +64,17 @@ export async function createCandidate(data: Omit<Candidate, 'id' | 'created_at'>
 }
 
 export async function updateCandidateStatus(id: string, status: string, notes?: string): Promise<void> {
+  const sql = getSql()
   await sql`UPDATE candidates SET status=${status},notes=${notes||null} WHERE id=${id}`
 }
 
 export async function deleteCandidate(id: string): Promise<void> {
+  const sql = getSql()
   await sql`DELETE FROM candidates WHERE id=${id}`
 }
 
 export async function getStats() {
+  const sql = getSql()
   const [total, pending, approved, rejected] = await Promise.all([
     sql`SELECT COUNT(*) FROM candidates`,
     sql`SELECT COUNT(*) FROM candidates WHERE status='pending'`,

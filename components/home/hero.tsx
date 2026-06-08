@@ -3,6 +3,52 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { SITE } from '@/lib/site-config'
+import { useEffect, useState } from 'react'
+
+const PHRASES = [
+  'Bienvenue dans la famille...',
+  'Les Démons de la Terreur...',
+  "L'élite vous attend...",
+  'Êtes-vous à la hauteur ?',
+]
+
+function TypeWriter() {
+  const [display, setDisplay] = useState('')
+  const [phraseIdx, setPhraseIdx] = useState(0)
+  const [charIdx, setCharIdx] = useState(0)
+  const [deleting, setDeleting] = useState(false)
+
+  useEffect(() => {
+    const phrase = PHRASES[phraseIdx]
+    let timeout: ReturnType<typeof setTimeout>
+
+    if (!deleting && charIdx < phrase.length) {
+      timeout = setTimeout(() => setCharIdx(i => i + 1), 60)
+    } else if (!deleting && charIdx === phrase.length) {
+      timeout = setTimeout(() => setDeleting(true), 1800)
+    } else if (deleting && charIdx > 0) {
+      timeout = setTimeout(() => setCharIdx(i => i - 1), 32)
+    } else if (deleting && charIdx === 0) {
+      setDeleting(false)
+      setPhraseIdx(i => (i + 1) % PHRASES.length)
+    }
+
+    return () => clearTimeout(timeout)
+  }, [charIdx, deleting, phraseIdx])
+
+  useEffect(() => {
+    setDisplay(PHRASES[phraseIdx].slice(0, charIdx))
+  }, [charIdx, phraseIdx])
+
+  return (
+    <div className="h-5 flex items-center justify-center">
+      <span className="font-mono text-xs tracking-widest text-blue-400">
+        {display}
+        <span className="animate-pulse ml-0.5 text-blue-400">|</span>
+      </span>
+    </div>
+  )
+}
 
 const STATS = [
   { value: '50+', label: 'Membres actifs' },
@@ -17,18 +63,17 @@ export function Hero() {
       {/* Video background */}
       <div className="absolute inset-0 z-0">
         <video autoPlay muted loop playsInline className="h-full w-full object-cover"
-          style={{ filter: 'brightness(0.25) saturate(0.7)' }}>
+          style={{ filter: 'brightness(0.22) saturate(0.6)' }}>
           <source src={SITE.heroVideo} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#060609]/60 via-transparent to-[#060609]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#060609]/70 via-transparent to-[#060609]" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#060609]/50 via-transparent to-[#060609]/50" />
-        {/* Noise overlay */}
-        <div className="absolute inset-0 noise-bg opacity-40" />
       </div>
 
       <div className="relative z-10 flex flex-col items-center px-5 text-center">
         {/* Status badge */}
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-8">
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+          className="mb-6">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-primary backdrop-blur-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             Recrutement ouvert
@@ -36,19 +81,23 @@ export function Hero() {
         </motion.div>
 
         {/* Title */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }} className="mb-4">
-          <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
-            SANTANA<span className="text-primary"> FAMILLE</span>
-          </h1>
-        </motion.div>
+        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}
+          className="text-4xl font-black tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl mb-3">
+          SANTANA<span className="text-primary"> FAMILLE</span>
+        </motion.h1>
 
-        <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
-          className="mb-2 text-xs font-semibold uppercase tracking-[0.4em] text-primary/70">
+        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.25 }}
+          className="mb-3 text-xs font-semibold uppercase tracking-[0.4em] text-primary/60">
           {SITE.nickname}
         </motion.p>
 
+        {/* Typewriter line */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mb-8">
+          <TypeWriter />
+        </motion.div>
+
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.35 }}
-          className="mb-10 max-w-md text-sm italic text-gray-400">
+          className="mb-10 max-w-md text-sm italic text-gray-500">
           &ldquo;{SITE.slogan}&rdquo;
         </motion.p>
 

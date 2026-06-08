@@ -1,21 +1,12 @@
 'use client'
 import { useChat } from '@ai-sdk/react'
-import { DefaultChatTransport } from 'ai'
 import { useState, useRef, useEffect } from 'react'
 import { Send, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FAQ_SUGGESTIONS } from '@/lib/site-config'
 
-function getText(msg: { parts?: { type: string; text?: string }[] }): string {
-  if (!msg.parts) return ''
-  return msg.parts.filter(p => p.type === 'text').map(p => p.text).join('')
-}
-
 export function SantanaChat({ className }: { className?: string }) {
-  const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ api: '/api/chat' }),
-  })
-  const [input, setInput] = useState('')
+  const { messages, input, handleInputChange, handleSubmit, status } = useChat({ api: '/api/chat' })
   const scrollRef = useRef<HTMLDivElement>(null)
   const busy = status === 'streaming' || status === 'submitted'
 
@@ -23,11 +14,11 @@ export function SantanaChat({ className }: { className?: string }) {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, status])
 
-  const submit = (text: string) => {
-    const value = text.trim()
-    if (!value || busy) return
-    sendMessage({ text: value })
-    setInput('')
+  const quickSend = (text: string) => {
+    if (busy) return
+    const syntheticEvent = { preventDefault: () => {} } as React.FormEvent<HTMLFormElement>
+    handleInputChange({ target: { value: text } } as React.ChangeEvent<HTMLInputElement>)
+    setTimeout(() => handleSubmit(syntheticEvent), 50)
   }
 
   return (
@@ -40,7 +31,7 @@ export function SantanaChat({ className }: { className?: string }) {
             </div>
             <div className="flex flex-wrap gap-2">
               {FAQ_SUGGESTIONS.map(q => (
-                <button key={q} onClick={() => submit(q)}
+                <button key={q} onClick={() => quickSend(q)}
                   className="rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-[11px] text-primary transition-colors hover:bg-primary/15">
                   {q}
                 </button>
@@ -51,8 +42,10 @@ export function SantanaChat({ className }: { className?: string }) {
         {messages.map(m => (
           <div key={m.id} className={cn('flex', m.role === 'user' ? 'justify-end' : 'justify-start')}>
             <div className={cn('max-w-[85%] whitespace-pre-wrap rounded-xl px-4 py-2.5 text-xs leading-relaxed',
-              m.role === 'user' ? 'bg-primary text-primary-foreground' : 'border border-white/[0.08] bg-white/[0.03] text-card-foreground')}>
-              {getText(m) || (m.role === 'assistant' && busy ? '…' : '')}
+              m.role === 'user'
+                ? 'bg-primary text-primary-foreground'
+                : 'border border-white/[0.08] bg-white/[0.03] text-card-foreground')}>
+              {m.content}
             </div>
           </div>
         ))}
@@ -67,12 +60,11 @@ export function SantanaChat({ className }: { className?: string }) {
           </div>
         )}
       </div>
-      <form onSubmit={e => { e.preventDefault(); submit(input) }}
-        className="flex items-center gap-2 border-t border-white/[0.06] p-3">
-        <input value={input} onChange={e => setInput(e.target.value)} placeholder="Écrivez votre message…"
+      <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-white/[0.06] p-3">
+        <input value={input} onChange={handleInputChange} placeholder="Écrivez votre message…"
           className="flex-1 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/30" />
         <button type="submit" disabled={busy || !input.trim()}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white transition-opacity disabled:opacity-40 box-glow" aria-label="Envoyer">
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white transition-opacity disabled:opacity-40" aria-label="Envoyer">
           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
         </button>
       </form>
