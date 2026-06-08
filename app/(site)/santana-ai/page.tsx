@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
   import { PageHeader } from '@/components/page-header'
-  import { SantanaChat } from '@/components/santana-chat'
+  import { SantanaChatClient } from '@/components/santana-chat-client'
 
   export const metadata: Metadata = {
     title: 'Santana AI — Assistant officiel',
@@ -25,7 +25,7 @@ import type { Metadata } from 'next'
               <span className="text-xs font-bold tracking-widest text-foreground">SANTANA <span className="text-primary">AI</span></span>
               <span className="ml-auto text-[10px] text-muted-foreground">En ligne 24h/24</span>
             </div>
-            <SantanaChat className="flex-1 min-h-0" />
+            <SantanaChatClient className="flex-1 min-h-0" />
           </div>
         </div>
       </div>
