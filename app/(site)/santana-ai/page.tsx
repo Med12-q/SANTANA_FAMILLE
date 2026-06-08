@@ -1,11 +1,6 @@
 import type { Metadata } from 'next'
-  import dynamic from 'next/dynamic'
   import { PageHeader } from '@/components/page-header'
-
-  const SantanaChat = dynamic(
-    () => import('@/components/santana-chat').then(m => m.SantanaChat),
-    { ssr: false }
-  )
+  import { SantanaChat } from '@/components/santana-chat'
 
   export const metadata: Metadata = {
     title: 'Santana AI — Assistant officiel',
