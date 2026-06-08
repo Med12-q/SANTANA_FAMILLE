@@ -1,13 +1,8 @@
 import type { ReactNode } from 'react'
-  import dynamic from 'next/dynamic'
   import { Navbar } from '@/components/navbar'
   import { Footer } from '@/components/footer'
   import { CyberBackground } from '@/components/background-fx'
-
-  const FloatingChat = dynamic(
-    () => import('@/components/floating-chat').then(m => m.FloatingChat),
-    { ssr: false }
-  )
+  import { FloatingChat } from '@/components/floating-chat'
 
   export default function SiteLayout({ children }: { children: ReactNode }) {
     return (
